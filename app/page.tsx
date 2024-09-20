@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { UserButton } from '@clerk/nextjs'
+import { UserButton } from '@clerk/nextjs';
 
 function Home() {
   const router = useRouter();
@@ -30,7 +30,10 @@ function Home() {
               <li>
                 <Link href="#contact">Contact</Link>
               </li>
-              <UserButton/>
+              {/* User button for authentication */}
+              <li>
+                <UserButton />
+              </li>
             </ul>
           </nav>
         </div>
@@ -42,7 +45,10 @@ function Home() {
         <p className="text-xl mb-6">
           Revolutionize your content creation with our AI-powered app, delivering engaging and high-quality text in seconds.
         </p>
-        <Button onClick={handleGetStarted} className="rounded-full bg-white text-black hover:ring-1 hover:ring-black-800 focus:outline-none">
+        <Button
+          onClick={handleGetStarted}
+          className="rounded-full bg-white text-black hover:ring-1 hover:ring-black-800 focus:outline-none"
+        >
           Get Started
         </Button>
       </section>
@@ -74,8 +80,8 @@ function Home() {
         </div>
       </section>
 
- {/* About Us Section */}
- <section id="about" className="w-full py-20 bg-white">
+      {/* About Us Section */}
+      <section id="about" className="w-full py-20 bg-white">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">About Us</h2>
           <p className="text-xl mb-6">
@@ -84,7 +90,6 @@ function Home() {
         </div>
       </section>
 
-
       {/* Contact Section */}
       <section id="contact" className="w-full py-20 bg-gray-100">
         <div className="max-w-7xl mx-auto text-center">
@@ -92,15 +97,29 @@ function Home() {
           <p className="text-xl mb-6">Have questions? Get in touch with us!</p>
           <form className="max-w-xl mx-auto">
             <div className="mb-4">
-              <input type="text" placeholder="Your Name" className="w-full p-3 rounded-lg border" />
+              <input
+                type="text"
+                placeholder="Your Name"
+                className="w-full p-3 rounded-lg border"
+              />
             </div>
             <div className="mb-4">
-              <input type="email" placeholder="Your Email" className="w-full p-3 rounded-lg border" />
+              <input
+                type="email"
+                placeholder="Your Email"
+                className="w-full p-3 rounded-lg border"
+              />
             </div>
             <div className="mb-4">
-              <textarea placeholder="Your Message" className="w-full p-3 rounded-lg border" rows="4"></textarea>
+              <textarea
+                placeholder="Your Message"
+                className="w-full p-3 rounded-lg border"
+                rows={4}  // Ensure rows is a number
+              ></textarea>
             </div>
-            <Button className="rounded-full bg-indigo-600 text-white">Send Message</Button>
+            <Button className="rounded-full bg-indigo-600 text-white">
+              Send Message
+            </Button>
           </form>
         </div>
       </section>

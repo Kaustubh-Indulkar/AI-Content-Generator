@@ -9,30 +9,53 @@ import { useRouter } from "next/navigation";
 import { TotalUsageContext } from "@/app/(context)/TotalUsageContext";
 import { UpdateCreditUsageContext } from "@/app/(context)/UpdateCreditUsageContext";
 
+// Update the type to match your actual data
+interface AIOutputType {
+    id: number;
+    FormData: string;
+    aiResponse: string | null; // Allow null
+    templateSlug: string;
+    createdBy: string;
+    createdAt: string | null; // Allow null
+}
+
 function UsageTrack() {
     const { user } = useUser();
     const { totalUsage, setTotalUsage } = useContext(TotalUsageContext);
     const router = useRouter();
-    const {updateCreditUsage,setUpdateCreditUsage}=useContext(UpdateCreditUsageContext);
-
+    const { updateCreditUsage, setUpdateCreditUsage } = useContext(UpdateCreditUsageContext);
 
     useEffect(() => {
-        user && GetData();
+        if (user) {
+            GetData();
+        }
     }, [user]);
 
-    useEffect(()=>{
-       user&&GetData();
-    },[updateCreditUsage&&user]);
+    useEffect(() => {
+        if (updateCreditUsage && user) {
+            GetData();
+        }
+    }, [updateCreditUsage, user]);
 
+    // Modified GetData with conditional check
     const GetData = async () => {
-        const result = await db.select().from(AIOutput).where(eq(AIOutput.createdBy, user?.primaryEmailAddress?.emailAddress));
+        const email = user?.primaryEmailAddress?.emailAddress;
+
+        // Ensure the email exists before querying the database
+        if (!email) {
+            console.error('User email is undefined');
+            return;
+        }
+
+        const result: AIOutputType[] = await db.select().from(AIOutput).where(eq(AIOutput.createdBy, email));
         GetTotalUsage(result);
     };
 
-    const GetTotalUsage = (result) => {
+    // Add type for result (AIOutputType[])
+    const GetTotalUsage = (result: AIOutputType[]) => {
         let total = 0;
         result.forEach(element => {
-            total = total + Number(element.aiResponse?.length);
+            total += Number(element.aiResponse?.length || 0); // Fallback to 0 if aiResponse is null
         });
         setTotalUsage(total);
         console.log(total);

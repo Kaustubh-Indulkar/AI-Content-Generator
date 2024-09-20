@@ -9,11 +9,11 @@ export interface TEMPLATE {
   category: string;
   slug: string;
   aiPrompt: string;
-  form?: FORM[];
+  form: FORM[];
 }
 
 export interface FORM {
-  label: string;
+  label?: string;
   field: string;
   name: string;
   required?: boolean;
@@ -34,8 +34,8 @@ function TemplateListSection({userSearchInput}:any) {
   
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 p-10">
-      {templateList.map((item: TEMPLATE, index: number) => (
-        <TemplateCard {...item} />
+      {templateList.map((item, index) => (
+        <TemplateCard key={index} {...item} />
       ))}
     </div>
   );

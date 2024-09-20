@@ -12,10 +12,10 @@ import { desc, eq } from "drizzle-orm";
 export interface HISTORY {
   ID: number;
   formData: string;
-  aiResponse: string;
+  aiResponse: string | null;  // Allow null for aiResponse
   templateSlug: string;
   createdBy: string;
-  createdAt: string;
+  createdAt: string | null;  // If createdAt can be null, handle that as well
 }
 
 function History() {
@@ -24,15 +24,24 @@ function History() {
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const email = user?.primaryEmailAddress?.emailAddress;
-      if (email) {
-        const result: HISTORY[] = await db
-          .select()
-          .from(AIOutput)
-          .where(eq(AIOutput.createdBy, email))
-          .orderBy(desc(AIOutput.id));
+      if (user) {
+        const email = user?.primaryEmailAddress?.emailAddress;
+        if (email) {
+          const result: HISTORY[] = await db
+            .select({
+              ID: AIOutput.id,
+              formData: AIOutput.FormData,
+              aiResponse: AIOutput.aiResponse ?? '',  // Handle null with default value
+              templateSlug: AIOutput.templateSlug,
+              createdBy: AIOutput.createdBy,
+              createdAt: AIOutput.createdAt,
+            })
+            .from(AIOutput)
+            .where(eq(AIOutput.createdBy, email))
+            .orderBy(desc(AIOutput.id));
 
-        setHistoryList(result);
+          setHistoryList(result);
+        }
       }
     };
 
@@ -41,7 +50,7 @@ function History() {
 
   const getTemplateName = (slug: string) => {
     const template: TEMPLATE | undefined = Templates?.find(
-      (item) => item.slug == slug
+      (item) => item.slug === slug
     );
     return template?.name;
   };
@@ -61,24 +70,25 @@ function History() {
       </div>
 
       {historyList.map((item, index) => (
-        <div className="grid grid-cols-7 my-5 py-3 px-3" key={index}>
+        <div className="grid grid-cols-7 my-5 py-3 px-3" key={item.ID}>
           <h2 className="col-span-2 flex gap-2 items-center">
-            <Image
-              src={Templates?.find((t) => t.slug === item.templateSlug)?.icon}
-              width={25}
-              height={25}
-              alt=""
-            />
-            {getTemplateName(item.templateSlug)}
-          </h2>
-          <h2 className="col-span-2 line-clamp-3">{item.aiResponse}</h2>
-          <h2>{item.createdAt}</h2>
-          <h2>{item.aiResponse.length}</h2>
+  <Image
+    src={Templates?.find((t) => t.slug === item.templateSlug)?.icon || '/fallback-image.png'}  // Provide fallback image
+    width={25}
+    height={25}
+    alt="Template Icon"
+  />
+  {getTemplateName(item.templateSlug)}
+</h2>
+
+          <h2 className="col-span-2 line-clamp-3">{item.aiResponse || 'N/A'}</h2> {/* Handle null for display */}
+          <h2>{item.createdAt || 'N/A'}</h2>  {/* Handle null for display */}
+          <h2>{item.aiResponse?.length || 0}</h2>  {/* Safely handle aiResponse length */}
           <h2>
             <Button
               variant="ghost"
               className="text-primary"
-              onClick={() => navigator.clipboard.writeText(item.aiResponse)}
+              onClick={() => item.aiResponse && navigator.clipboard.writeText(item.aiResponse)}  // Avoid copying null
             >
               Copy
             </Button>
